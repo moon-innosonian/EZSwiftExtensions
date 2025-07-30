@@ -136,4 +136,23 @@ extension UIImage {
     }
 }
 
+extension UIImage {
+    
+    /// Returns a base64-encoded string of the image using full quality JPEG compression.
+    public var base64Encoded: String? {
+        jpegData(compressionQuality: 1.0)?.base64EncodedString()
+    }
+
+    /// Compresses the image to the specified quality rate (from 0.0 to 1.0) and returns the data.
+    /// - Parameter quality: Compression quality (0 = max compression, 1 = best quality)
+    public func compressedJPEGData(quality: CGFloat) -> Data? {
+        jpegData(compressionQuality: quality)
+    }
+
+    /// Returns the size of the image in bytes using full quality JPEG compression.
+    public var jpegSizeInBytes: Int {
+        jpegData(compressionQuality: 1.0)?.count ?? 0
+    }
+}
+
 #endif
