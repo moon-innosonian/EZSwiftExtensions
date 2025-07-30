@@ -8,44 +8,63 @@
 
 #if os(iOS)
 
-import UIKit
+import WebKit
 
-///Make sure you use  `[weak self] (NSURLRequest) in` if you are using the keyword `self` inside the closure or there might be a memory leak
-open class BlockWebView: UIWebView, UIWebViewDelegate {
+open class BlockWebView: WKWebView, WKNavigationDelegate {
+
     open var didStartLoad: ((URLRequest) -> Void)?
     open var didFinishLoad: ((URLRequest) -> Void)?
     open var didFailLoad: ((URLRequest, Error) -> Void)?
+    open var shouldStartLoadingRequest: ((URLRequest) -> Bool)?
 
-    open var shouldStartLoadingRequest: ((URLRequest) -> (Bool))?
-
-    public override init(frame: CGRect) {
-        super.init(frame: frame)
-        delegate = self
+    public override init(frame: CGRect, configuration: WKWebViewConfiguration = WKWebViewConfiguration()) {
+        super.init(frame: frame, configuration: configuration)
+        self.navigationDelegate = self
     }
 
-    public required init?(coder aDecoder: NSCoder) {
-        super.init(coder: aDecoder)
+    public required init?(coder: NSCoder) {
+        super.init(coder: coder)
+        self.navigationDelegate = self
     }
 
-    open func webViewDidStartLoad(_ webView: UIWebView) {
-        didStartLoad? (webView.request!)
-    }
+    // MARK: - WKNavigationDelegate
 
-    open func webViewDidFinishLoad(_ webView: UIWebView) {
-        didFinishLoad? (webView.request!)
-    }
+    open func webView(_ webView: WKWebView, decidePolicyFor navigationAction: WKNavigationAction,
+                      decisionHandler: @escaping (WKNavigationActionPolicy) -> Void) {
 
-    open func webView(_ webView: UIWebView, didFailLoadWithError error: Error) {
-        didFailLoad? (webView.request!, error)
-    }
-
-    open func webView(_ webView: UIWebView, shouldStartLoadWith request: URLRequest, navigationType: UIWebView.NavigationType) -> Bool {
-        if let should = shouldStartLoadingRequest {
-            return should (request)
+        if let should = shouldStartLoadingRequest,
+           let request = navigationAction.request as URLRequest? {
+            let allow = should(request)
+            decisionHandler(allow ? .allow : .cancel)
         } else {
-            return true
+            decisionHandler(.allow)
+        }
+    }
+
+    open func webView(_ webView: WKWebView, didStartProvisionalNavigation navigation: WKNavigation!) {
+        if let request = webView.url.map({ URLRequest(url: $0) }) {
+            didStartLoad?(request)
+        }
+    }
+
+    open func webView(_ webView: WKWebView, didFinish navigation: WKNavigation!) {
+        if let request = webView.url.map({ URLRequest(url: $0) }) {
+            didFinishLoad?(request)
+        }
+    }
+
+    open func webView(_ webView: WKWebView, didFail navigation: WKNavigation!, withError error: Error) {
+        if let request = webView.url.map({ URLRequest(url: $0) }) {
+            didFailLoad?(request, error)
+        }
+    }
+
+    open func webView(_ webView: WKWebView, didFailProvisionalNavigation navigation: WKNavigation!, withError error: Error) {
+        if let request = webView.url.map({ URLRequest(url: $0) }) {
+            didFailLoad?(request, error)
         }
     }
 }
+
 
 #endif
