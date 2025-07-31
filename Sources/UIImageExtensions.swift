@@ -14,17 +14,17 @@ extension UIImage {
     
     /// EZSE: Returns base64 string
     public var base64: String {
-        return jpegData(compressionQuality: 1)!.base64EncodedString()
+        return UIImageJPEGRepresentation(self, 1)!.base64EncodedString()
     }
     
     /// EZSE: Returns compressed image to rate from 0 to 1
     public func compressImage(rate: CGFloat) -> Data? {
-        return jpegData(compressionQuality: rate)
+        return UIImageJPEGRepresentation(self, rate)
     }
 
     /// EZSE: Returns Image size in Bytes
     public func getSizeAsBytes() -> Int {
-        return jpegData(compressionQuality: 1)?.count ?? 0
+        return UIImageJPEGRepresentation(self, 1)?.count ?? 0
     }
 
     /// EZSE: Returns Image size in Kylobites
@@ -140,18 +140,18 @@ extension UIImage {
     
     /// Returns a base64-encoded string of the image using full quality JPEG compression.
     public var base64Encoded: String? {
-        jpegData(compressionQuality: 1.0)?.base64EncodedString()
+        UIImageJPEGRepresentation(self, 1.0)?.base64EncodedString()
     }
 
     /// Compresses the image to the specified quality rate (from 0.0 to 1.0) and returns the data.
     /// - Parameter quality: Compression quality (0 = max compression, 1 = best quality)
     public func compressedJPEGData(quality: CGFloat) -> Data? {
-        jpegData(compressionQuality: quality)
+        UIImageJPEGRepresentation(self, quality)
     }
 
     /// Returns the size of the image in bytes using full quality JPEG compression.
     public var jpegSizeInBytes: Int {
-        jpegData(compressionQuality: 1.0)?.count ?? 0
+        UIImageJPEGRepresentation(self, 1.0)?.count ?? 0
     }
 }
 
