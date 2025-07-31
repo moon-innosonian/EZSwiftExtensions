@@ -380,7 +380,7 @@ extension String {
 
     ///EZSE: Returns underlined NSAttributedString
     public func underline() -> NSAttributedString {
-        let underlineString = NSAttributedString(string: self, attributes: [NSAttributedString.Key.underlineStyle: NSUnderlineStyle.single.rawValue])
+        let underlineString = NSAttributedString(string: self, attributes: [NSAttributedString.Key.underlineStyle: NSUnderlineStyle.styleSingle.rawValue])
         return underlineString
     }
     
